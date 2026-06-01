@@ -1,0 +1,30 @@
+# systemd unit for the cross-post service.
+# Install:
+#   sudo cp /opt/crosspost/crosspost.service /etc/systemd/system/crosspost.service
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now crosspost
+#   sudo systemctl status crosspost
+#   journalctl -u crosspost -f      # live logs
+#
+# Adjust User= to whichever account owns the files (likely the ghost user).
+[Unit]
+Description=Ghost cross-post service (X + Reddit)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ghost
+WorkingDirectory=/opt/crosspost
+ExecStart=/usr/bin/env node server.js
+Restart=on-failure
+RestartSec=5
+# Hardening: this service only needs to read its own dir and talk to the network.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/opt/crosspost
+ProtectHome=true
+
+[Install]
+WantedBy=multi-user.target

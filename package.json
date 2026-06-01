@@ -1,0 +1,15 @@
+{
+  "name": "crosspost",
+  "version": "1.0.0",
+  "description": "Cross-post Ghost published posts to X and Reddit. Triggered by a Ghost post.published webhook. Dependency-free (Node 22 built-ins only).",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "bootstrap:reddit": "node bootstrap-reddit.mjs",
+    "post": "node send-test.mjs"
+  }
+}

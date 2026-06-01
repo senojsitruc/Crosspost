@@ -1,0 +1,31 @@
+{
+  "port": 3737,
+  "host": "127.0.0.1",
+  "ghostWebhookSecret": "REPLACE_WITH_A_50+_CHAR_RANDOM_STRING",
+  "signatureToleranceMs": 300000,
+  "maxBackdateMs": 21600000,
+  "dryRun": true,
+  "siteUrl": "https://example.com",
+  "targets": {
+    "x": true,
+    "reddit": true,
+    "facebook": true
+  },
+  "x": {
+    "consumerKey": "REPLACE_WITH_API_KEY",
+    "consumerSecret": "REPLACE_WITH_API_SECRET_KEY",
+    "accessToken": "REPLACE_WITH_ACCESS_TOKEN",
+    "accessTokenSecret": "REPLACE_WITH_ACCESS_TOKEN_SECRET"
+  },
+  "reddit": {
+    "clientId": "REPLACE",
+    "clientSecret": "REPLACE",
+    "redirectUri": "http://localhost/callback",
+    "username": "your_reddit_username",
+    "userAgent": "web:my-ghost-crosspost:v1.0 (by /u/your_reddit_username)"
+  },
+  "facebook": {
+    "pageId": "REPLACE_WITH_PAGE_ID",
+    "pageAccessToken": "REPLACE_WITH_NEVER_EXPIRING_PAGE_TOKEN"
+  }
+}

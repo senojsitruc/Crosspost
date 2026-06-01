@@ -1,0 +1,28 @@
+# Secrets and live config — NEVER commit. Use config.example.json as the template.
+config.json
+config.backup.json
+config.*.json
+!config.example.json
+
+# Rotating OAuth tokens and run state
+tokens.json
+ledger.json
+*.tmp
+
+# Backups / dumps
+backups/
+*.bak
+*.sql
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.idea/
+.vscode/
