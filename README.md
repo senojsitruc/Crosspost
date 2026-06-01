@@ -163,4 +163,4 @@ node send-test.mjs "Post Title" "https://example.com/slug/" "Optional excerpt te
 
 ## License
 
-No license yet — add one (e.g. MIT) if you'd like others to reuse this.
+[MIT](LICENSE) © 2026 Curtis Jones
