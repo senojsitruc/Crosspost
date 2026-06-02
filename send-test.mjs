@@ -9,7 +9,7 @@ import { loadTokens } from './lib/store.js';
 import { postToX } from './lib/x.js';
 import { postToReddit } from './lib/reddit.js';
 import { postToFacebook } from './lib/facebook.js';
-import { buildXText, buildRedditTitle } from './lib/message.js';
+import { buildXText, buildRedditTitle, buildFacebookMessage } from './lib/message.js';
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
 const config = JSON.parse(readFileSync(join(ROOT, 'config.json'), 'utf8'));
@@ -30,5 +30,5 @@ if (config.targets.reddit) {
   console.log('Reddit ->', await postToReddit(config, tokens.reddit, { title: buildRedditTitle(title), url }).catch((e) => e.message));
 }
 if (config.targets.facebook) {
-  console.log('Facebook ->', await postToFacebook(config, { message: excerpt || title, link: url }).catch((e) => e.message));
+  console.log('Facebook ->', await postToFacebook(config, { message: buildFacebookMessage({ title, excerpt, url }), link: url }).catch((e) => e.message));
 }

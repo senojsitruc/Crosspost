@@ -10,7 +10,7 @@ import { loadTokens, alreadyPosted, recordResult } from './lib/store.js';
 import { postToX } from './lib/x.js';
 import { postToReddit } from './lib/reddit.js';
 import { postToFacebook } from './lib/facebook.js';
-import { postUrl, buildXText, buildRedditTitle } from './lib/message.js';
+import { postUrl, buildXText, buildRedditTitle, buildFacebookMessage } from './lib/message.js';
 import { info, warn, error } from './lib/log.js';
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
@@ -76,7 +76,7 @@ async function fanOut(post) {
   }
   if (config.targets.facebook) {
     jobs.push(
-      withRetry('Facebook', () => postToFacebook(config, { message: excerpt || title, link: url }))
+      withRetry('Facebook', () => postToFacebook(config, { message: buildFacebookMessage({ title, excerpt, url }), link: url }))
         .then((r) => { results.facebook = { ok: true, ...r }; })
         .catch((e) => { results.facebook = { ok: false, error: e.message }; error('Facebook fan-out failed', e); })
     );
