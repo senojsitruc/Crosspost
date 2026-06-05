@@ -9,7 +9,8 @@
   "targets": {
     "x": true,
     "reddit": true,
-    "facebook": true
+    "facebook": true,
+    "pinterest": true
   },
   "x": {
     "consumerKey": "REPLACE_WITH_API_KEY",
@@ -27,5 +28,12 @@
   "facebook": {
     "pageId": "REPLACE_WITH_PAGE_ID",
     "pageAccessToken": "REPLACE_WITH_NEVER_EXPIRING_PAGE_TOKEN"
+  },
+  "pinterest": {
+    "clientId": "REPLACE_WITH_APP_ID",
+    "clientSecret": "REPLACE_WITH_APP_SECRET",
+    "redirectUri": "https://example.com/pinterest/callback",
+    "boardId": "REPLACE_WITH_BOARD_ID",
+    "fallbackImageUrl": "https://example.com/path/to/default-cover.jpg"
   }
 }

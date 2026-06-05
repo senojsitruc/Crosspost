@@ -1,7 +1,8 @@
 # Crosspost
 
 Automatically cross-post your **[Ghost](https://ghost.org)** blog posts to **X
-(Twitter)**, a **Facebook Page**, and **Reddit** the moment you hit publish.
+(Twitter)**, a **Facebook Page**, **Reddit**, and **Pinterest** the moment you hit
+publish.
 
 It's a tiny, **dependency-free** Node service (Node 22 built-ins only — nothing to
 `npm install`). Ghost fires a `post.published` webhook at it; it verifies the
@@ -11,7 +12,8 @@ each platform.
 ```
 Ghost (post.published) ──webhook──▶ Crosspost ──┬─▶ X API (OAuth 1.0a)
                                                  ├─▶ Facebook Graph API
-                                                 └─▶ Reddit API (OAuth2)
+                                                 ├─▶ Reddit API (OAuth2)
+                                                 └─▶ Pinterest API v5 (OAuth2)
 ```
 
 ## Features
@@ -22,7 +24,8 @@ Ghost (post.published) ──webhook──▶ Crosspost ──┬─▶ X API (O
 - **Skips backfill** — a configurable window (`maxBackdateMs`, default 6h) means publishing an old/backdated post won't spam your followers with stale content.
 - **Idempotent** — records what it posted (`ledger.json`), so a webhook retry won't double-post.
 - **Resilient** — acknowledges the webhook immediately, then posts in the background with retries; one platform failing doesn't block the others.
-- **Per-target toggles** — enable/disable X, Facebook, Reddit independently.
+- **Per-target toggles** — enable/disable X, Facebook, Reddit, Pinterest independently.
+- **Pinterest-aware** — Pins require an image, so each Pin uses the post's `feature_image` (or a configurable fallback) and links back to the post.
 
 ## The platform-access reality (as of 2026)
 
@@ -34,12 +37,19 @@ differs. This is what to expect:
 | **X** | **Pay-per-use** — no free tier for new developers since Feb 2026; ~**$0.20 per post containing a URL** | Low — just attach billing | OAuth 1.0a (permanent tokens, no refresh — simplest for a single account) |
 | **Reddit** | Free (non-commercial) | Medium — a one-time **API access application** is required, even for personal use | OAuth2 (refresh token) |
 | **Facebook** | Free | **Low for your own Page** — see below | Never-expiring Page access token |
+| **Pinterest** | Free | **Low for your own boards** — default *trial access* allows posting to boards you own; no app review needed | OAuth2 (refresh token, rotated each refresh) |
 
 **Facebook is easier than its reputation.** Posting to a Page **you administer**
 from **your own app** needs only **Standard Access** for `pages_manage_posts` (+
 `pages_read_engagement`, `pages_show_list`), which Meta grants **without App Review
 or Business Verification**. App Review + Business Verification are only required to
 post to Pages you *don't* manage (Advanced Access).
+
+**Pinterest needs an image for every Pin.** Unlike the other targets (which attach
+a bare link and let the preview card render), the Pinterest API won't create a Pin
+without media. Crosspost uses the post's `feature_image` as the Pin image, falling
+back to `pinterest.fallbackImageUrl` so posts without a feature image still get
+pinned. Pinterest's default *trial access* is enough to post to boards you own.
 
 **Ghost won't deliver webhooks to `localhost`.** In production, Ghost blocks
 webhook targets that resolve to a private/loopback IP (you'll see
@@ -91,6 +101,16 @@ tested (in dry-run it logs what it *would* post without calling any API).
   ```bash
   node bootstrap-reddit.mjs   # opens an auth URL; paste the redirect back
   ```
+- **Pinterest** — create an app at <https://developers.pinterest.com/apps/>, add a
+  redirect URI that **exactly** matches `pinterest.redirectUri` (Pinterest requires
+  HTTPS), and copy the **App ID/secret** into `pinterest.clientId`/`clientSecret`.
+  Set `pinterest.fallbackImageUrl` to a hosted default cover image, then run the
+  one-time auth flow:
+  ```bash
+  node bootstrap-pinterest.mjs   # opens an auth URL; paste the redirect back
+  ```
+  It saves the refresh token and prints your boards — copy the target board's id
+  into `pinterest.boardId`.
 
 ### 3. Run it
 
@@ -123,8 +143,8 @@ Publish a post (or flip `dryRun` off after testing) and watch the logs.
 | `maxBackdateMs` | Skip posts whose `published_at` is older than this (0 = post everything) |
 | `dryRun` | If true, log intended posts without calling any API |
 | `siteUrl` | Fallback base URL for building post links |
-| `targets` | `{ x, reddit, facebook }` booleans |
-| `x`, `reddit`, `facebook` | Per-platform credentials |
+| `targets` | `{ x, reddit, facebook, pinterest }` booleans |
+| `x`, `reddit`, `facebook`, `pinterest` | Per-platform credentials |
 
 ## Testing / re-posting
 
@@ -154,9 +174,11 @@ node send-test.mjs "Post Title" "https://example.com/slug/" "Optional excerpt te
 | `lib/oauth1.js` | OAuth 1.0a request signing |
 | `lib/facebook.js` | Facebook Page poster (Graph API) |
 | `lib/reddit.js` | Reddit poster (OAuth2, with token refresh) |
+| `lib/pinterest.js` | Pinterest poster (API v5, OAuth2 with rotating refresh token) |
 | `lib/store.js` | Token + idempotency-ledger persistence |
 | `lib/log.js` | Minimal structured logging |
 | `bootstrap-reddit.mjs` | One-time Reddit OAuth authorization |
+| `bootstrap-pinterest.mjs` | One-time Pinterest OAuth authorization (also lists boards) |
 | `send-test.mjs` | Manually post a URL to enabled targets |
 | `config.example.json` | Config template (copy to `config.json`) |
 | `crosspost.service` | systemd unit template |

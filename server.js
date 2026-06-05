@@ -10,7 +10,8 @@ import { loadTokens, alreadyPosted, recordResult } from './lib/store.js';
 import { postToX } from './lib/x.js';
 import { postToReddit } from './lib/reddit.js';
 import { postToFacebook } from './lib/facebook.js';
-import { postUrl, buildXText, buildRedditTitle, buildFacebookMessage } from './lib/message.js';
+import { postToPinterest } from './lib/pinterest.js';
+import { postUrl, buildXText, buildRedditTitle, buildFacebookMessage, buildPinterest } from './lib/message.js';
 import { info, warn, error } from './lib/log.js';
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
@@ -79,6 +80,18 @@ async function fanOut(post) {
       withRetry('Facebook', () => postToFacebook(config, { message: buildFacebookMessage({ title, excerpt, url }), link: url }))
         .then((r) => { results.facebook = { ok: true, ...r }; })
         .catch((e) => { results.facebook = { ok: false, error: e.message }; error('Facebook fan-out failed', e); })
+    );
+  }
+
+  if (config.targets.pinterest) {
+    // Pins require an image; use the post's feature_image, falling back to a
+    // configured branded image so every post still gets pinned.
+    const imageUrl = post.feature_image || config.pinterest?.fallbackImageUrl;
+    const pin = buildPinterest({ title, excerpt });
+    jobs.push(
+      withRetry('Pinterest', () => postToPinterest(config, tokens.pinterest, { ...pin, link: url, imageUrl }))
+        .then((r) => { results.pinterest = { ok: true, ...r }; })
+        .catch((e) => { results.pinterest = { ok: false, error: e.message }; error('Pinterest fan-out failed', e); })
     );
   }
 
