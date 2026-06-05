@@ -9,6 +9,10 @@ tokens.json
 ledger.json
 *.tmp
 
+# Machine-specific local notes / overrides (deployment runbooks, etc.) — never committed
+*.local
+*.local.*
+
 # Backups / dumps
 backups/
 *.bak
