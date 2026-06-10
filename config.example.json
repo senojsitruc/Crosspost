@@ -6,6 +6,11 @@
   "maxBackdateMs": 21600000,
   "dryRun": true,
   "siteUrl": "https://example.com",
+  "landing": {
+    "appName": "Crosspost",
+    "tagline": "Automatic Pinterest cross-posting for my blog",
+    "description": "Crosspost is a personal automation tool that publishes new posts from my blog to my own Pinterest board. It is built for my blog alone and does not post on anyone else's behalf."
+  },
   "targets": {
     "x": true,
     "reddit": true,
